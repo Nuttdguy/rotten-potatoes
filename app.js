@@ -1,28 +1,37 @@
 const express = require('express');
 const handlebars = require('express-handlebars');
+const mongoose = require('mongoose');
+
 const app = express();
 
 // CONFIGURE APPLICATION PROPERTIES FOR HANDLING VIEWS
 app.engine('handlebars', handlebars({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 
-let reviews = [
-    {title: 'Great Review'},
-    {title: 'Next Review'}
-];
 
+// CONNECT TO MONGO-DB
+mongoose.connect('mongodb://localhost/rotten-potatoes');
+
+
+let Review = mongoose.model('Review', {
+    title: String
+});
 
 // ROUTES ============
 
-// GET REQUEST ENDPOINT FOR HANDING INDEX/ROOT PAGE REQUESTS
-// app.get('/', function (req, res) {
-//     res.render('home', {msg: 'Hello World!'})
-// });
-
 app.get('/', function (req, res) {
-    res.render('reviews-index', {reviews: reviews})
+
+    // USE THE MONGOOSE OBJECT MODEL, USE FIND METHOD
+    Review.find(function (err, reviews) {
+
+        // PASS RESULT TO RENDER IN INDEX USING REVIEWS AS VARIABLE
+        res.render('reviews-index', {reviews: reviews})
+    })
 });
 
+app.get('/reviews/new', function(req, res) {
+    res.render('./reviews/reviews-new', {});
+});
 
 
 // SERVER ===============
