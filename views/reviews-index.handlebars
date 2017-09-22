@@ -1,9 +1,31 @@
 <h1>Reviews</h1>
-
 <a href="/reviews/new">New Review</a>
 
-{{#each reviews}}
+<div class="row">
 
-    <h3>{{this.title}}</h3>
+    <div class="col-sm-6" >
+        {{#each reviews}}
 
-{{/each}}
+            <br><a href="/reviews/{{this._id}}">view</a><br>
+            <a href="/reviews/{{this._id}}/edit">edit</a>
+
+            <form method="POST" action="/reviews/{{this._id}}?_method=DELETE">
+                <button type="submit">Delete</button>
+            </form>
+
+            <h5>{{this.title}}</h5>
+            <h5>{{this.rating}}</h5>
+            <small>{{this.movieTitle}}</small>
+            <p>{{this.description}}</p>
+
+
+        {{/each}}
+
+
+    </div>
+
+
+</div>
+
+
+

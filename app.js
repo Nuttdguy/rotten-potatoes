@@ -2,32 +2,35 @@ const express = require('express');
 const handlebars = require('express-handlebars');
 const mongoose = require('mongoose');
 const body_parser = require('body-parser'); // required to perform POST
+const method_override = require('method-override');
 
 const app = express();
+
 
 // CONFIGURE APPLICATION PROPERTIES FOR HANDLING VIEWS
 app.engine('handlebars', handlebars({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
-app.use(body_parser.urlencoded({extended: true}))
+app.use(body_parser.urlencoded({extended: true}));
+app.use(method_override('_method'));
+
 
 // CONNECT TO MONGO-DB
 mongoose.connect('mongodb://localhost/rotten-potatoes');
 
 
 let Review = mongoose.model('Review', {
-    title: String
+    title: String,
+    description: String,
+    movieTitle: String,
+    rating: Number
 });
 
 // ROUTES ============
 
 app.get('/', function (req, res) {
-
-    // USE THE MONGOOSE OBJECT MODEL, USE FIND METHOD
     Review.find(function (err, reviews) {
-
-        // PASS RESULT TO RENDER IN INDEX USING REVIEWS AS VARIABLE
         res.render('reviews-index', {reviews: reviews})
-    })
+    });
 });
 
 app.get('/reviews/new', function (req, res) {
@@ -35,10 +38,53 @@ app.get('/reviews/new', function (req, res) {
 });
 
 app.post('/reviews', function (req, res) {
-    res.render('reviews-index');
-    // console.log(req.body);
+    Review.create(req.body, (err, review) => {
+        res.redirect('/')
+    });
 });
 
+app.get('/reviews/:id', (req, res) => {
+    Review.findById(req.params.id).then((review) => {
+        res.render('./reviews/reviews-show', {review}) // { review: review }
+    }).catch((err) => {
+        console.log(err);
+    });
+});
+
+app.get('/reviews/:id/edit', (req, res) => {
+    Review.findById(req.params.id).then((review) => {
+        console.log(review);
+        res.render('./reviews/review-edit', {review})
+
+    }).catch((err) => {
+        console.log(err);
+    })
+});
+
+app.put('/reviews/:id', (req, res) => {
+    Review.findOneAndUpdate(req.params.id, req.body, ((review) => {
+        res.redirect('/reviews/' + review._id, { review });
+    })).catch((err) => {
+        console.log(err);
+    });
+});
+
+app.delete('/reviews/:id', (req, res) => {
+    Review.findByIdAndRemove(req.params.id, () => {
+        res.redirect('/');
+    }).catch((err) => {
+        console.log(err);
+    })
+});
+
+// domain.com/someid/?name=jojo&age=33
+
+// app.get('/:any', (req, res) => {
+// req.params.any <- someid
+// req.query.name <-  = jojo
+//}
+
+// app.get('/:year/:month/:date/:title')
 
 // SERVER ===============
 
