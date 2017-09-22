@@ -1,0 +1,18 @@
+<h1>Edit Review</h1>
+
+<form method="POST" action="/reviews?method=PUT">
+
+    <label for="title">Title</label>
+    <input type="text" name="title" value="{{review.title}}" /><br>
+
+    <label for="movieTitle">Movie Title</label>
+    <input type="text" name="movieTitle" value="{{review.movieTitle}}" /><br>
+
+    <label for="rating">Rating</label>
+    <input type="number" name="rating" value="{{review.rating}}" /><br>
+
+    <label for="description">Description</label><br>
+    <textarea name="description" rows="10">{{review.description}}</textarea>
+
+    <button type="submit">Update</button>
+</form>
